@@ -1,3 +1,4 @@
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -47,10 +48,7 @@ st.markdown("""
 # Header
 col_head1, col_head2 = st.columns([0.5, 5])
 with col_head1:
-    try:
-        st.image("nas_logo.png", width=60)
-    except:
-        pass
+    st.image(Path(__file__).parent / "nas_logo.png", width=60)
 with col_head2:
     st.markdown("<h2 style='margin-top: 0; padding-top: 0;'>קפה נאס - הערכת השקעה</h2>", unsafe_allow_html=True)
 
@@ -72,10 +70,10 @@ else:
 st.sidebar.header("2. מבנה העסקה")
 asking_price = st.sidebar.number_input("מחיר מבוקש ל-50%", value=140000, step=5000)
 vat_rate = 17.0 / 100.0
-poi_active = st.sidebar.checkbox("לכלול עבודה אישית?", value=False)
-poi_cost = st.sidebar.number_input("עלות עבודה אישית (POI שנתי)", value=16800, step=1000)
-tax_rate = st.sidebar.number_input("מס שולי (לחישוב נטו)", value=47.0, step=1.0) / 100.0
-
+# poi_active = st.sidebar.checkbox("לכלול עבודה אישית?", value=False)
+# poi_cost = st.sidebar.number_input("עלות עבודה אישית (POI שנתי)", value=16800, step=1000)
+# tax_rate = st.sidebar.number_input("מס שולי (לחישוב נטו)", value=47.0, step=1.0) / 100.0
+tax_rate = 47.0 / 100.0
 # --- Main Dashboard ---
 
 # Placeholder for metrics
@@ -225,10 +223,10 @@ with col_right: # Visually Right in RTL
     rent = 0 # Need to extract rent specifically for waterfall
     
     with st.expander("הוצאות תפעול", expanded=False):
-        for key, (label, default) in opex_items.items():
+        for key, (opex_label, default) in opex_items.items():
             # Checkbox for utils
             use_checkbox = (key == "utils")
-            val = pl_row(label, f"opex_{key}", default, indent=True, checkbox=use_checkbox)
+            val = pl_row(opex_label, f"opex_{key}", default, indent=True, checkbox=use_checkbox)
             opex_sum += val
             if key == "arnona" or key == "fees":
                 continue
@@ -280,7 +278,7 @@ with col_right: # Visually Right in RTL
     with col3: st.markdown(f"{(cost_vat_amt / revenue * 100) if revenue else 0:.1f}%")
 
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("מע״מ (משוער)")
+    with col1: st.markdown("מע״מ לתשלום")
     with col2: st.markdown(f"₪{vat_payment:,.0f}")
     
     # Net Profit After VAT
@@ -309,7 +307,7 @@ investor_gross_share = net_profit_after_vat * investor_share_pct
 # Assuming tax_rate is Income Tax.
 investor_tax = investor_gross_share * tax_rate
 investor_net_after_tax = investor_gross_share - investor_tax
-investor_economic_profit = investor_net_after_tax - poi_cost * int(poi_active)
+# investor_economic_profit = investor_net_after_tax - poi_cost * int(poi_active)
 
 # Investment with VAT
 investment_cost = asking_price * (1 + vat_rate)
@@ -336,7 +334,7 @@ with metrics_container:
     
     # Conditional coloring
     col2.metric("רווח נקי (אחרי מע״מ)", f"₪{net_profit_after_vat:,.0f}", )
-    col3.metric("הרווח הנקי שלך (אחרי מס)", f"₪{investor_net_after_tax:,.0f}", help=f"בניכוי {tax_rate*100:.0f}% מס. רווח כלכלי (בניכוי POI): ₪{investor_economic_profit:,.0f}")
+    col3.metric("הרווח הנקי שלך (אחרי מס)", f"₪{investor_net_after_tax:,.0f}", help=f"בניכוי {tax_rate*100:.0f}% מס. ")
     
     col4.metric("תקופת החזר השקעה", f"{payback_years:.1f} שנים")
 
