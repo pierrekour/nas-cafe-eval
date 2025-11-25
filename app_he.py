@@ -19,8 +19,8 @@ st.markdown("""
     }
     /* Adjust metric value alignment if needed, though usually LTR for numbers is fine */
     div[data-testid="stMetricValue"] {
-        direction: ltr; 
-        text-align: right;
+        direction: rtl; 
+        text-align: right !important;;
     }
     /* Reduce spacing */
     div.block-container {
@@ -209,7 +209,7 @@ with col_right: # Visually Right in RTL
     opex_items = {
         "rent": ("שכירות", int(def_rev * 0.07)),
         "arnona": ("ארנונה", 45*288),
-        "utils": ("חשמל ומים", 22000),
+        "utils": ("חשמל ומים", 15000),
         "comm": ("תקשורת", 2400),
         "marketing": ("שיווק", 1200),
         "maint": ("תחזוקה", 15000),
@@ -318,7 +318,7 @@ payback_years = investment_cost / investor_net_after_tax if investor_net_after_t
 
 # Valuation
 valuation_multiple_low = 1.0
-valuation_multiple_high = 1.5
+valuation_multiple_high = 1.4
 assets_value = 85000 
 stock_value = 8000
 
@@ -383,10 +383,10 @@ other_opex = opex - rent
 fig_waterfall = go.Figure(go.Waterfall(
     name = "20", orientation = "v",
     measure = ["relative", "relative", "total", "relative", "relative", "relative", "total"],
-    x = ["הכנסות", "עלות מכר", "רווח גולמי", "שכירות", "משכורות", "שאר הוצאות", "EBITDA"],
+    x = ["הכנסות", "עלות מכר", "רווח גולמי", "משכורות", "שכירות", "שאר הוצאות", "EBITDA"],
     textposition = "outside",
-    text = [f"{x/1000:.0f}k" for x in [revenue, -cogs, gross_profit, -rent, -salaries, -other_opex, ebitda]],
-    y = [revenue, -cogs, gross_profit, -rent, -salaries, -other_opex, ebitda],
+    text = [f"{x/1000:.0f}k" for x in [revenue, -cogs, gross_profit, -salaries, -rent, -other_opex, ebitda]],
+    y = [revenue, -cogs, gross_profit, -salaries, -rent, -other_opex, ebitda],
     connector = {"line":{"color":"rgb(63, 63, 63)"}},
 ))
 
