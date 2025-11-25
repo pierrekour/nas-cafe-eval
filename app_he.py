@@ -221,6 +221,7 @@ with col_right: # Visually Right in RTL
     }
     
     opex_sum = 0
+    opex_vat_sum = 0
     rent = 0 # Need to extract rent specifically for waterfall
     
     with st.expander("הוצאות תפעול", expanded=False):
@@ -229,7 +230,11 @@ with col_right: # Visually Right in RTL
             use_checkbox = (key == "utils")
             val = pl_row(label, f"opex_{key}", default, indent=True, checkbox=use_checkbox)
             opex_sum += val
-            if key == "rent": rent = val
+            if key == "arnona" or key == "fees":
+                continue
+            if key == "rent":
+                rent = val
+            opex_vat_sum += val
 
     opex_pct = (opex_sum / revenue * 100) if revenue else 0
     
@@ -265,10 +270,15 @@ with col_right: # Visually Right in RTL
     # VAT
     # Base = Revenue - COGS - OpEx (Salaries and Depr excluded)
     # All are positive now, so we subtract expenses
-    vat_base = revenue - cogs - opex_sum
-    vat_amount = int(vat_base * vat_rate)
-    vat_payment = vat_amount # Positive amount to pay
+    cost_vat_amt = cogs + opex_vat_sum
+    cost_vat_base = revenue - cost_vat_amt
+    vat_payment = int(cost_vat_base * vat_rate)
     
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1: st.markdown("הוצאות מוכרות למע\"מ")
+    with col2: st.markdown(f"₪{cost_vat_amt:,.0f}")
+    with col3: st.markdown(f"{(cost_vat_amt / revenue * 100) if revenue else 0:.1f}%")
+
     col1, col2, col3 = st.columns([2, 1, 1])
     with col1: st.markdown("מע״מ (משוער)")
     with col2: st.markdown(f"₪{vat_payment:,.0f}")
@@ -311,10 +321,11 @@ payback_years = investment_cost / investor_net_after_tax if investor_net_after_t
 # Valuation
 valuation_multiple_low = 1.0
 valuation_multiple_high = 1.5
-assets_value = 85000 + 8000 # Equipment + Stock
+assets_value = 85000 
+stock_value = 8000
 
-val_low = (ebitda * valuation_multiple_low) + assets_value
-val_high = (ebitda * valuation_multiple_high) + assets_value
+val_low = (ebitda * valuation_multiple_low) + assets_value + stock_value
+val_high = (ebitda * valuation_multiple_high) + assets_value + stock_value
 stake_val_low = val_low * 0.5
 stake_val_high = val_high * 0.5
 
@@ -334,9 +345,9 @@ with col_left: # Visually Left in RTL
 
     # Valuation Table
     val_data = {
-        "גבוה": [ebitda, valuation_multiple_high, ebitda*valuation_multiple_high, assets_value, val_high, stake_val_high],
-        "נמוך": [ebitda, valuation_multiple_low, ebitda*valuation_multiple_low, assets_value, val_low, stake_val_low],
-        "מדד": ["EBITDA", "מכפיל", "שווי תפעולי", "נכסים (ציוד+מלאי)", "שווי עסק כולל", "שווי הנתח שלך (50%)"],
+        "גבוה": [ebitda, valuation_multiple_high, ebitda*valuation_multiple_high, assets_value, stock_value, val_high, stake_val_high],
+        "נמוך": [ebitda, valuation_multiple_low, ebitda*valuation_multiple_low, assets_value, stock_value, val_low, stake_val_low],
+        "מדד": ["EBITDA", "מכפיל", "שווי תפעולי", "ציוד", "מלאי", "שווי עסק כולל", "שווי הנתח שלך (50%)"],
     }
     df_val = pd.DataFrame(val_data)
     
