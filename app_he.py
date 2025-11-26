@@ -2,7 +2,6 @@ from pathlib import Path
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 
 # Page Config
 st.set_page_config(page_title="הערכת שווי - קפה נאס", layout="wide")
@@ -148,12 +147,16 @@ with col_right: # Visually Right in RTL
     # 1. Revenue
     # We need specific handling for Revenue to trigger updates if needed, but standard is fine.
     rev_key = f"{revenue_scenario}_revenue"
-    if rev_key not in st.session_state: st.session_state[rev_key] = def_rev
+    if rev_key not in st.session_state:
+        st.session_state[rev_key] = def_rev
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("##### הכנסות")
-    with col2: revenue = st.number_input("הכנסות", key=rev_key, step=10000, label_visibility="collapsed")
-    with col3: st.markdown("100.0%")
+    with col1:
+        st.markdown("##### הכנסות")
+    with col2:
+        revenue = st.number_input("הכנסות", key=rev_key, step=10000, label_visibility="collapsed")
+    with col3:
+        st.markdown("100.0%")
 
     # 2. Food Cost (Synced)
     cogs_amt_key = f"{revenue_scenario}_cogs_amount"
@@ -172,22 +175,30 @@ with col_right: # Visually Right in RTL
             st.session_state[cogs_pct_key] = (amt / rev) * 100.0 # Positive
 
     # Init (Positive values now)
-    if cogs_amt_key not in st.session_state: st.session_state[cogs_amt_key] = def_rev * (def_cogs_pct / 100.0)
-    if cogs_pct_key not in st.session_state: st.session_state[cogs_pct_key] = def_cogs_pct
+    if cogs_amt_key not in st.session_state:
+        st.session_state[cogs_amt_key] = def_rev * (def_cogs_pct / 100.0)
+    if cogs_pct_key not in st.session_state:
+        st.session_state[cogs_pct_key] = def_cogs_pct
 
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**עלות סחורה**")
-    with col2: cogs = st.number_input("עלות מכר", key=cogs_amt_key, step=1000, on_change=update_cogs_pct, label_visibility="collapsed")
-    with col3: cogs_pct = st.number_input("%", key=cogs_pct_key, step=0.5, on_change=update_cogs_amount, label_visibility="collapsed", format="%.1f")
+    with col1:
+        st.markdown("**עלות סחורה**")
+    with col2:
+        cogs = st.number_input("עלות מכר", key=cogs_amt_key, step=1000, on_change=update_cogs_pct, label_visibility="collapsed")
+    with col3:
+        cogs_pct = st.number_input("%", key=cogs_pct_key, step=0.5, on_change=update_cogs_amount, label_visibility="collapsed", format="%.1f")
 
     # 3. Gross Profit
     gross_profit = revenue - cogs # Subtract positive expense
     gp_pct = (gross_profit / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**רווח גולמי**")
-    with col2: st.markdown(f"**₪{gross_profit:,.0f}**")
-    with col3: st.markdown(f"**{gp_pct:.1f}%**")
+    with col1:
+        st.markdown("**רווח גולמי**")
+    with col2:
+        st.markdown(f"**₪{gross_profit:,.0f}**")
+    with col3: 
+        st.markdown(f"**{gp_pct:.1f}%**")
         
     # 4. Salaries
     # Positive defaults
@@ -200,9 +211,12 @@ with col_right: # Visually Right in RTL
     sal_pct = (salaries / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**סה״כ משכורות**")
-    with col2: st.markdown(f"**₪{salaries:,.0f}**")
-    with col3: st.markdown(f"**{sal_pct:.1f}%**")
+    with col1:
+        st.markdown("**סה״כ משכורות**")
+    with col2:
+        st.markdown(f"**₪{salaries:,.0f}**")
+    with col3:
+        st.markdown(f"**{sal_pct:.1f}%**")
 
     # 5. OpEx
     # Define OpEx items (Positive defaults)
@@ -211,9 +225,9 @@ with col_right: # Visually Right in RTL
         "arnona": ("ארנונה", 45*288),
         "utils": ("חשמל ומים", 15000),
         "comm": ("תקשורת", 2400),
-        "marketing": ("שיווק", 1200),
+        "marketing": ("שיווק", 8000),
         "maint": ("תחזוקה", 15000),
-        "legal": ("הנה״ח ומשרדיות", 12000),
+        "legal": ("הנה״ח ומשרדיות", 18000),
         "fees": ("עמלות/אגרות", 3000), # Added Fees
         "misc": ("שונות", 2000)
     }
@@ -237,9 +251,12 @@ with col_right: # Visually Right in RTL
     opex_pct = (opex_sum / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**סה״כ הוצאות תפעול**")
-    with col2: st.markdown(f"**₪{opex_sum:,.0f}**")
-    with col3: st.markdown(f"**{opex_pct:.1f}%**")
+    with col1:
+        st.markdown("**סה״כ הוצאות תפעול**")
+    with col2:
+        st.markdown(f"**₪{opex_sum:,.0f}**")
+    with col3:
+        st.markdown(f"**{opex_pct:.1f}%**")
     
     # Total Expenses
     total_expenses = salaries + opex_sum
@@ -249,9 +266,12 @@ with col_right: # Visually Right in RTL
     ebitda_pct = (ebitda / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("רווח לפני ריבית, מיסים, פחת והפחתות")
-    with col2: st.markdown(f"₪{ebitda:,.0f}")
-    with col3: st.markdown(f"{ebitda_pct:.1f}%")
+    with col1:
+        st.markdown("רווח לפני ריבית, מיסים, פחת והפחתות")
+    with col2:
+        st.markdown(f"₪{ebitda:,.0f}")
+    with col3:
+        st.markdown(f"{ebitda_pct:.1f}%")
     
     # Depreciation
     depreciation = pl_row("פחת", "depreciation", 12750) # Positive
@@ -261,9 +281,12 @@ with col_right: # Visually Right in RTL
     nppt_pct = (net_profit_pretax / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**רווח נקי (לפני מס)**")
-    with col2: st.markdown(f"**₪{net_profit_pretax:,.0f}**")
-    with col3: st.markdown(f"**{nppt_pct:.1f}%**")
+    with col1:
+        st.markdown("**רווח נקי (לפני מס)**")
+    with col2:
+        st.markdown(f"**₪{net_profit_pretax:,.0f}**")
+    with col3:
+        st.markdown(f"**{nppt_pct:.1f}%**")
     
     # VAT
     # Base = Revenue - COGS - OpEx (Salaries and Depr excluded)
@@ -273,22 +296,30 @@ with col_right: # Visually Right in RTL
     vat_payment = int(cost_vat_base * vat_rate)
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("הוצאות מוכרות למע\"מ")
-    with col2: st.markdown(f"₪{cost_vat_amt:,.0f}")
-    with col3: st.markdown(f"{(cost_vat_amt / revenue * 100) if revenue else 0:.1f}%")
+    with col1:
+        st.markdown("הוצאות מוכרות למע\"מ")
+    with col2:
+        st.markdown(f"₪{cost_vat_amt:,.0f}")
+    with col3:
+        st.markdown(f"{(cost_vat_amt / revenue * 100) if revenue else 0:.1f}%")
 
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("מע״מ לתשלום")
-    with col2: st.markdown(f"₪{vat_payment:,.0f}")
+    with col1:
+        st.markdown("מע״מ לתשלום")
+    with col2:
+        st.markdown(f"₪{vat_payment:,.0f}")
     
     # Net Profit After VAT
     net_profit_after_vat = net_profit_pretax - vat_payment
     npav_pct = (net_profit_after_vat / revenue * 100) if revenue else 0
     
     col1, col2, col3 = st.columns([2, 1, 1])
-    with col1: st.markdown("**רווח נקי (אחרי מע״מ)**")
-    with col2: st.markdown(f"**₪{net_profit_after_vat:,.0f}**")
-    with col3: st.markdown(f"**{npav_pct:.1f}%**")
+    with col1:
+        st.markdown("**רווח נקי (אחרי מע״מ)**")
+    with col2:
+        st.markdown(f"**₪{net_profit_after_vat:,.0f}**")
+    with col3:
+        st.markdown(f"**{npav_pct:.1f}%**")
     
     # Assign opex for compatibility with waterfall
     opex = opex_sum
