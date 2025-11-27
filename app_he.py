@@ -53,8 +53,8 @@ with col_head2:
     st.markdown(LABELS["header_title"], unsafe_allow_html=True)
 
 # --- Sidebar: Inputs ---
-revenue_scenario = st.sidebar.selectbox(LABELS["scenario_select"], LABELS["scenarios"], index=1)
-
+# revenue_scenario = st.sidebar.selectbox(LABELS["scenario_select"], LABELS["scenarios"], index=1)
+revenue_scenario ="realistic"
 asking_price = st.sidebar.number_input(LABELS["asking_price"], value=DEFAULTS["asking_price"], step=5000)
 assets_value = st.sidebar.number_input(LABELS["equipment_value"], value=int(DEFAULTS["assets_value"] * (1 - DEFAULTS["impairment_mult"])), step=2000)
 stock_value = st.sidebar.number_input(LABELS['stock'], value=DEFAULTS["stock_value"], step=1000)
@@ -65,7 +65,7 @@ arnona_area_key = f"{revenue_scenario}_arnona_area"
 arnona_price_per_sqm = DEFAULTS["arnona_price_per_sqm"]
 if arnona_area_key not in st.session_state:
     st.session_state[arnona_area_key] = DEFAULTS["arnona_area"]
-area = st.sidebar.number_input(LABELS['arnona_area'], value=st.session_state[arnona_area_key], key=arnona_area_key, min_value=1, step=1)
+area = st.sidebar.number_input(LABELS['arnona_area'], value=st.session_state[arnona_area_key], min_value=1, step=1)
 st.sidebar.markdown(f"{LABELS['arnona_price_per_sqm']}: <b>{arnona_price_per_sqm}₪</b>", unsafe_allow_html=True)
 arnona_val = area * arnona_price_per_sqm
 st.session_state[f"{revenue_scenario}_arnona"] = arnona_val
@@ -178,7 +178,7 @@ with col_right: # Visually Right in RTL
     with col2:
         cogs = st.number_input(LABELS["food_cost"], key=cogs_amt_key, step=1000, on_change=update_cogs_pct, label_visibility="collapsed")
     with col3:
-        cogs_pct = st.number_input("%", key=cogs_pct_key, step=0.5, on_change=update_cogs_amount, label_visibility="collapsed", format="%.1f")
+        cogs_pct = st.number_input("%", key=cogs_pct_key, step=0.2, on_change=update_cogs_amount, label_visibility="collapsed", format="%.1f")
 
     # 3. Gross Profit
     gross_profit = revenue - cogs # Subtract positive expense
